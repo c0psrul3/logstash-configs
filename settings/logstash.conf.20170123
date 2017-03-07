@@ -1,0 +1,127 @@
+input {
+
+    file {
+        type => "syslog"
+        path => [ "/var/log/messages", "/var/log/syslog" ]
+        #path => [ "/var/log/*.log", "/var/log/messages", "/var/log/syslog" ]
+        start_position => "beginning"
+    }
+
+    syslog {
+        host => "0.0.0.0"
+        port => 5514
+        severity_labels => ["Emergency", "Alert", "Critical", "Error", "Warning", "Notice", "Informational", "Debug"]
+        #tags => ["", ""]
+        facility_labels => ["kernel", "user-level", "mail", "system", "security/authorization", "syslogd", "line printer", "network news", "UUCP", "clock", "security/authorization", "FTP", "NTP", "log audit", "log alert", "clock", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7"]
+    }
+
+    beats {
+        port => 5044
+        ssl => true
+        ssl_certificate => "/usr/local/etc/ssl/gnetsys_com__wildcard.crt"
+        ssl_key => "/usr/local/etc/ssl/gnetsys_com__wildcard.key"
+
+    }
+
+    redis {
+        #host => "127.0.0.1"
+        #host => "172.19.1.135"
+        #port => 6379
+
+        key => "logstash"
+        data_type => "list"
+        #  ## If redis\_type is list, then we will BLPOP the key
+        #  ## If redis\_type is channel, then we will SUBSCRIBE to the key
+        #  ## If redis\_type is pattern_channel, then we will PSUBSCRIBE to the key.
+
+        #message_format => "json_event"         ## No Longer Valid
+        #codec => "json"
+
+        #tags => ["geneva"]
+    }
+    ## JDBC input / MySQL msg source
+    jdbc {
+        jdbc_driver_library => "/usr/local/share/java/classes/mysql-connector-java.jar"
+        jdbc_driver_class => "com.mysql.jdbc.Driver"
+        jdbc_connection_string => "jdbc:mysql://localhost:3306/GNSMSG"
+        jdbc_user => "gns"
+        jdbc_password => "test123"
+        parameters => {
+            "task" => "nagios"
+        }
+        schedule => "* * * * *"
+        statement => "SELECT id,hostname,clientname,timezone,created,task,target,subject,class,ipaddress,jobref,source FROM `TblMessage` WHERE task = :task ORDER BY created"
+	   ## id,hostname,clientname,timezone,created,task,name,target,message,subject,priority,class,processed,ipaddress,jobref,source,status
+        jdbc_paging_enabled => "true"
+        jdbc_page_size => "5"
+    }
+
+}
+
+filter {
+
+    ## Syslog Message Collection
+    if [type] == "syslog" {
+        grok {
+            match => { 
+                "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}"
+            }
+            add_field => [ "received_at", "%{@timestamp}" ]
+            add_field => [ "received_from", "%{host}" ]
+        }
+        if !("_grokparsefailure" in [tags]) {
+            mutate {
+                replace => [ "@source_host", "%{syslog_hostname}" ]
+                replace => [ "@message", "%{syslog_message}" ]
+            }
+        } else {
+            mutate {
+                remove_field => [ "syslog_hostname", "syslog_message" ]
+            }
+        }
+        date {
+            match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss", "ISO8601" ]
+        }
+        syslog_pri { }
+    } 
+
+    ## Nginx Access Logs
+    if [type] == "nginx-access" {
+        grok {
+            match => { "message" => "%{NGINXACCESS}" }
+        }
+    }
+
+}
+##/end FILTERS
+
+output {
+    elasticsearch {
+        #hosts => [ "127.0.0.1:9200" ]
+        hosts => [ "127.0.0.1:9292" ]
+        #sniffing => true
+        #manage_template => false
+        #index => "logstash-2016.10.06"
+        #index => "logstash-%{+YYYY.MM.dd}"
+        #index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+        #document_type => "%{[@metadata][type]}"
+    }
+
+    #if [message] =~ /(error|ERROR|CRITICAL)/ {
+    #    nagios {
+    #        # your config here
+    #}}
+
+    #influxdb {
+    #    host => localhost
+    #    #port =>
+    #    db => GNS-test
+    #    #password => 
+    #    data_points => ...
+    #}
+
+    stdout {
+        codec => rubydebug
+    }
+}
+
