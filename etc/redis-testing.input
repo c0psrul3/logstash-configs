@@ -1,0 +1,44 @@
+input {
+  redis {
+    #host => "127.0.0.1"
+    #host => "172.19.1.135"
+    #port => 6379
+
+    key => "logstash"
+    data_type => "list"
+    #  ## If redis\_type is list, then we will BLPOP the key
+    #  ## If redis\_type is channel, then we will SUBSCRIBE to the key
+    #  ## If redis\_type is pattern_channel, then we will PSUBSCRIBE to the key.
+
+    #message_format => "json_event"         ## No Longer Valid
+    #codec => "json"
+
+    #tags => ["geneva"]
+  }
+}
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { 
+        "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}"
+      }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+
+      #add_field => [ "timestamp", "%{@timestamp}" ]
+    }
+    mutate {
+      rename => {
+        "@type" => "_type"
+      }
+      #rename => {
+      #  "@source_host" => "host"
+      #}
+    }
+    #syslog_pri { }
+    #date {
+    #  match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    #}
+  }
+}

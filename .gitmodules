@@ -1,0 +1,3 @@
+[submodule "vendor/logstash/mmorenog_Kibana"]
+	path = vendor/logstash/mmorenog_Kibana
+	url = https://github.com/mmorenog/Kibana.git

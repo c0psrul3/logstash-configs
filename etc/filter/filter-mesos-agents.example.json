@@ -1,0 +1,21 @@
+filter {
+  if ([type] == "mesos_containers") {
+    grok {
+      break_on_match => false
+      match => { "source" => "/var/lib/mesos/slaves/(?<agent>[\w\-]+)/frameworks/(?<framework>[\w\-]+)/executors/(?<executor>[\w\-\._]+)/runs" }
+    }
+  } else if ([type] == "mesos_agents") {
+    grok {
+      break_on_match => false
+      match => { "message" => "task '?(?<task>[\w\-\.]+)'?" }
+      match => { "message" => "ontainer '%{UUID:container}'" }
+      match => { "message" => "framework '?(?<framework>[\w\-]+)'?" }
+      match => { "message" => "executor '?(?<executor>[\w\-\._]+)'?" }
+      match => { "message" => "status update %{WORD:status}" }
+      match => { "message" => "UUID: %{UUID:UUID}" }
+      match => { "message" => "/var/lib/mesos/slaves/(?<agent>[\w\-]+)/frameworks/(?<framework>[\w\-]+)/executors/(?<executor>[\w\-\.]+)/runs/%{UUID:run}" }
+      match => { "message" => "(?<class>[A-Z])%{MONTHNUM:month}%{MONTHDAY:day} %{TIME:time}  %{INT:pid} (?<sourcecode>[\w\.]+):%{POSINT:line}] %{GREEDYDATA:message}" }
+      overwrite => [ "message" ]
+    }
+  }
+}

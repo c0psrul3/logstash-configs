@@ -1,0 +1,32 @@
+input {
+  tcp {
+    port => 5001
+    type => syslog
+  }
+  udp {
+    port => 5001
+    type => syslog
+  }
+}
+
+filter {
+    grok {
+      match => { "message" => "id=%{DATA:program} time=\"%{TIMESTAMP_ISO8601}\" fw=%{IP:syslog_host} pri=%{NUMBER} msg=\"session %{DATA:close_msg}: %{IP:src_ip}/%{INT:src_port}->%{IP:dst_ip}/%{INT:dst_port} %{DATA:service} %{IP:src_ip_nat}/%{INT:src_port_nat}->%{IP:dst_ip_nat}/%{INT:dst_port_nat} %{DATA:ka} %{DATA:nat_pilicy} %{INT:policy_id} %{DATA:policy_name} %{DATA:src_zone} %{DATA:dst_zone} %{INT:session_id} %{INT:packet_in}\(%{INT:bytes_in}\) %{INT:packet_out}\(%{INT:bytes_out}\) %{DATA:unknow} %{DATA:unknow} %{DATA:unknow} %{DATA:unkown} %{DATA:in_interface}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    syslog_pri { }
+    if !("_grokparsefailure" in [tags]) {
+      mutate {
+        replace => [ "@source_host", "%{syslog_host}" ]
+        replace => [ "@message", "%{syslog_host}: %{src_ip}:%{src_port}(NAT: %{src_ip_nat}:%{src_port_nat}) -> %{dst_ip}:%{dst_port}(NAT: %{dst_ip_nat}:%{dst_port_nat}) %{close_msg}" ]
+      }
+    }
+    mutate {
+      remove_field => [ "syslog_host", "syslog_timestamp" ]
+    }
+}
+
+output {
+  redis { host => "127.0.0.1" data_type => "list" key => "logstash" }
+}

@@ -1,0 +1,94 @@
+
+
+https://github.com/logstash-plugins/logstash-input-beats
+https://github.com/logstash-plugins/logstash-input-beats
+
+https://github.com/logstash-plugins/logstash-output-redis
+https://github.com/logstash-plugins/logstash-input-redis
+
+https://github.com/logstash-plugins/logstash-filter-elasticsearch
+https://github.com/logstash-plugins/logstash-output-elasticsearch
+https://github.com/logstash-plugins/logstash-input-elasticsearch
+
+https://github.com/logstash-plugins/logstash-filter-dns
+https://github.com/logstash-plugins/logstash-filter-grok
+https://github.com/logstash-plugins/logstash-input-stdin
+
+https://github.com/logstash-plugins/logstash-patterns-core
+
+https://github.com/logstash-plugins/logstash-input-generator
+
+https://github.com/logstash-plugins/logstash-input-rss
+https://github.com/logstash-plugins/logstash-output-rabbitmq
+15.9.2016 11:01  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-output-email.git src/logstash-output-email.git
+15.9.2016 10:46  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-codec-json_lines.git src/logstash-codec-json_lines.git
+15.9.2016 10:46  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-codec-graphite.git src/logstash-codec-graphite.git
+15.9.2016 10:45  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-input-rabbitmq.git src/logstash-input-rabbitmq.git
+15.9.2016 10:45  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-input-syslog.git src/logstash-input-syslog.git
+15.9.2016 10:40  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-filter-geoip.git src/logstash-filter-geoip.git
+15.9.2016 10:39  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-output-stdout.git src/logstash-output-stdout.git
+15.9.2016 10:38  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-output-graphite.git src/logstash-output-graphite.git
+15.9.2016 10:38  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-output-zeromq.git src/logstash-output-zeromq.git
+15.9.2016 10:36  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-output-file.git src/logstash-output-file.git
+15.9.2016 10:36  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-input-redis.git src/logstash-input-redis.git
+15.9.2016 10:30  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-input-file.git src/logstash-input-file.git
+15.9.2016 10:28  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-input-relp.git src/logstash-input-relp.git
+15.9.2016 10:28  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-output-redmine.git src/logstash-output-redmine.git
+15.9.2016 10:27  git clone -o logstash-plugins https://github.com/logstash-plugins/logstash-filter-zeromq.git src/logstash-filter-zeromq.git
+
+https://github.com/logstash-plugins/logstash-input-sqlite
+
+https://github.com/logstash-plugins/logstash-codec-netflow.git
+
+https://github.com/logstash-plugins/logstash-input-udp
+https://github.com/logstash-plugins/logstash-output-udp
+https://github.com/logstash-plugins/logstash-output-tcp
+https://github.com/logstash-plugins/logstash-output-xmpp
+https://github.com/logstash-plugins/logstash-output-pipe
+https://github.com/logstash-plugins/logstash-output-null
+https://github.com/logstash-plugins/logstash-output-nagios_nsca
+https://github.com/logstash-plugins/logstash-output-nagios
+https://github.com/logstash-plugins/logstash-output-irc
+https://github.com/logstash-plugins/logstash-output-exec
+https://github.com/logstash-plugins/logstash-input-xmpp
+https://github.com/logstash-plugins/logstash-input-unix
+https://github.com/logstash-plugins/logstash-input-snmptrap
+https://github.com/logstash-plugins/logstash-input-irc
+https://github.com/logstash-plugins/logstash-input-imap
+https://github.com/logstash-plugins/logstash-input-graphite
+
+https://github.com/logstash-plugins/logstash-input-wmi.git
+
+https://github.com/logstash-plugins/logstash-filter-syslog_pri
+https://github.com/logstash-plugins/logstash-filter-sleep
+https://github.com/logstash-plugins/logstash-filter-multiline
+https://github.com/logstash-plugins/logstash-filter-json
+https://github.com/logstash-plugins/logstash-filter-date
+https://github.com/logstash-plugins/logstash-filter-checksum
+https://github.com/logstash-plugins/logstash-codec-plain
+https://github.com/logstash-plugins/logstash-codec-line
+https://github.com/logstash-plugins/logstash-codec-fluent
+https://github.com/logstash-plugins/logstash-codec-edn_lines
+https://github.com/logstash-plugins/logstash-codec-edn
+https://github.com/logstash-plugins/logstash-codec-dots
+https://github.com/logstash-plugins/logstash-codec-collectd
+https://github.com/logstash-plugins/logstash-input-zeromq
+https://github.com/logstash-plugins/logstash-input-heartbeat
+https://github.com/logstash-plugins/logstash-filter-example
+https://github.com/logstash-plugins/logstash-output-example
+https://github.com/logstash-plugins/logstash-input-example
+https://github.com/logstash-plugins/logstash-codec-example
+https://github.com/logstash-plugins/logstash-input-perfmon
+https://github.com/logstash-plugins/logstash-filter-yaml
+https://github.com/logstash-plugins/logstash-codec-nmap
+https://github.com/logstash-plugins/logstash-output-logentries
+https://github.com/logstash-plugins/logstash-output-firehose
+https://github.com/logstash-plugins/logstash-input-websocket
+https://github.com/logstash-plugins/logstash-input-salesforce
+https://github.com/logstash-plugins/logstash-input-fluentd
+https://github.com/logstash-plugins/logstash-filter-lookup
+https://github.com/logstash-plugins/logstash-filter-alter
+https://github.com/logstash-plugins/logstash-codec-sflow
+https://github.com/logstash-plugins/logstash-codec-oldlogstashjson
+https://github.com/logstash-plugins/logstash-codec-csv
+
