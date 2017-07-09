@@ -1,6 +1,6 @@
 [submodule "vendor/logstash/mmorenog_Kibana"]
 	path = vendor/logstash/mmorenog_Kibana
 	url = https://github.com/mmorenog/Kibana.git
-[submodule "etc/logstash_grok_syslog"]
-	path = etc/logstash_grok_syslog
+[submodule "logstash_grok_syslog.gist"]
+	path = logstash_grok_syslog.gist
 	url = https://gist.github.com/166c5cbacca1f032ec299a204279f62b.git
