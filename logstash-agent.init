@@ -1,13 +1,16 @@
-#! /bin/sh
+#!/usr/bin/env bash
+#
 # From The Logstash Book
-# The original of this file can be found at: http://logstashbook.com/code/index.html
+# ----------------------
+# The original of this file can be found at: [[http://logstashbook.com/code/index.html]]
 #
 #
-# Logstash Start/Stop logstash
+# @file: Logstash Start/Stop service script
 #
 # chkconfig: 345 99 99
 # description: Logstash
 # processname: logstash
+#
 
 name="logstash-agent"
 logstash_bin="/opt/logstash/bin/logstash"

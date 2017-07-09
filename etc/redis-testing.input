@@ -1,3 +1,5 @@
+# /*  vim:  set filetype=yaml :  */
+#
 input {
   redis {
     #host => "127.0.0.1"
@@ -42,3 +44,11 @@ filter {
     #}
   }
 }
+
+#
+# Debug output to stdout
+#
+output {
+  stdout { codec => rubydebug }
+}
+
