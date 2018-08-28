@@ -1,0 +1,26 @@
+# This loads the patterns found in /etc/logstash/patterns and
+# defines matches for five types of audit-log.
+# AUDITLOGIN is found from another archive than this one.
+# The 'date' section tells Grok to parse the Unixtime posted
+# to audit-entries as the timestamp for the event.
+filter {
+  grok {
+    patterns_dir => "/etc/logstash/patterns/"
+    match => {
+      "message" => [
+        "%{AUDITLOGIN}",
+        "%{AUDITSYSCALL}",
+        "%{AUDITEXECVE}",
+        "%{AUDITCWD}",
+        "%{AUDITPATHLONG}",
+        "%{AUDITPATHSHORT}",
+        "%{AUDITPAMLOGIN}",
+        "%{AUDITCONFIG}"
+      ]
+    }
+  }
+  date {
+    match => [ 'audit_epoch', 'UNIX' ]
+  }
+}
+

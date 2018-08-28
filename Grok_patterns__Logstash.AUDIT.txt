@@ -1,0 +1,135 @@
+
+
+
+# EXAMPLES:
+>>>>>
+Aug  4 09:26:39 jcy-sol-06 audit: [ID 160015 audit.notice] login - ssh ok session 940483954 by gns as gns:staff in dargencore01 from 172.19.4.14
+Aug  4 09:26:39 jcy-sol-06 audit: [ID 619272 audit.notice] fcntl(2) ok session 940483954 by gns as gns:staff in dargencore01 from 172.19.4.14
+Aug  4 09:26:39 jcy-sol-06 last message repeated 4 times
+Aug  4 09:26:39 jcy-sol-06 audit: [ID 457240 audit.notice] socket(2) ok session 940483954 by gns as gns:staff in dargencore01 from 172.19.4.14
+Aug  4 09:26:39 jcy-sol-06 last message repeated 5 times
+Aug  4 09:26:39 jcy-sol-06 audit: [ID 572595 audit.notice] shutdown(2) ok session 940483954 by gns as gns:staff in dargencore01 from 172.19.4.14
+<<<<<
+
+
+
+#
+# Resources:
+# ----------
+#   [[https://serverfault.com/questions/609192/how-to-parse-audit-log-using-logstash#609195]]
+#   [[https://github.com/alikins/logstash-audit/blob/master/logstash.conf]]
+#   [[https://gitlab.com/sysadmin1138/logstash-auditlog.git]]
+#
+
+#
+#  + The audit logs are written as a series of key=value pairs which are easily
+#     extracted using the kv filter. However I have noticed that the key msg is
+#     sometimes used twice and is also a series of key=value pairs.
+#
+
+input {
+    file {
+        path => "/var/log/audit/audit.log"
+        type => "selinux_audit"
+        start_position => beginning
+        sincedb_path => "/tmp/audit.sincedb"
+        }
+}
+
+filter {
+  #
+  # grok will parse fields:
+  #    audit_type , audit_epoch , audit_counter , sub_msg (the 2nd msg field)
+  #
+  grok {
+    #pattern => [ "type=%{DATA:audit_type}\smsg=audit\(%{NUMBER:audit_epoch}:%{NUMBER:audit_counter}\):.*?( msg=\'(?<sub_msg>.*?)\')?$" ]
+    named_captures_only => true
+    #
+    # the format for grok has changed, so have a look at this:
+    # example: type=CRED_DISP msg=audit(1431084081.914:298): pid=1807 uid=0 auid=1000 ses=7 msg='op=PAM:setcred acct="user1" exe="/usr/sbin/sshd" hostname=host1 addr=192.168.160.1 terminal=ssh res=success'
+    #
+    match => {
+      "message" => "type=%{WORD:audit_type} msg=audit\(%{NUMBER:audit_epoch}:%{NUMBER:audit_counter}\): pid=%{NUMBER:audit_pid} uid=%{NUMBER:audit_uid} auid=%{NUMBER:audit_audid} ses=%{NUMBER:ses} msg=\'op=%{WORD:operation}:%{WORD:detail_operation} acct=\"%{WORD:acct_user}\" exe=\"%{GREEDYDATA:exec}\" hostname=%{GREEDYDATA:hostname} addr=%{GREEDYDATA:ipaddr} terminal=%{WORD:terminal} res=%{WORD:result}\'" }
+  }
+
+  #
+  # kv is used to extract all of the key=value pairs except for msg and
+  # type, since we have already obtained that data with grok:
+  #
+  kv {
+    exclude_keys => [ "msg", "type" ]
+  }
+
+  #
+  # kv is used again to parse the key=value pairs in sub_msg ( if it exists ):
+  #
+  kv {
+    source => "sub_msg"
+  }
+
+  #
+  # date will set the timestamp of each individual message (document) to the 
+  # value of field 'audit_epoch', using the date format UNIX will parse float or
+  # integer timestamps:
+  #
+  date {
+    match => [ "audit_epoch", "UNIX" ]
+  }
+
+  # mutate is used to remove redundant fields and optionally rename fields
+  mutate {
+    remove_field => ['sub_msg', 'audit_epoch']
+
+    rename => [
+      "auid", "uid_audit",
+      "fsuid", "uid_fs",
+      "suid", "uid_set",
+      "ses", "session_id"
+    ]
+  }
+}
+
+
+
+
+
+
+---
+
+```
+filter {
+  grok {
+    pattern => [ "type=%{DATA:audit_type}\smsg=audit\(%{NUMBER:audit_epoch}:%{NUMBER:audit_counter}\):.*?( msg=\'(?<sub_msg>.*?)\')?$" ]
+    named_captures_only => true
+  }
+  kv {
+    exclude_keys => [ "msg", "type" ]
+  }
+  kv {
+    source => "sub_msg"
+  }
+  date {
+    match => [ "audit_epoch", "UNIX" ]
+  }
+  mutate {
+    rename => [
+      "auid", "uid_audit",
+      "fsuid", "uid_fs",
+      "suid", "uid_set",
+      "ses", "session_id"
+    ]
+    remove_field => ['sub_msg', 'audit_epoch']
+  }
+}
+```
+
+
++++++++++++++++++
+    }
+
+filter {
+    date {
+        match => [ "audit_epoch", "UNIX_MS" ]
+    }
+}
+

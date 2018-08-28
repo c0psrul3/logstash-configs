@@ -1,0 +1,12 @@
+# This input tells logstash to monitor the audit-log, and to add
+# A service field with the value of 'audit' in it. This service
+# field can be used by filters to focus parsing.
+input {
+  file {
+    path => '/var/log/audit/audit.log'
+    type => 'audit'
+    add_field => {
+      "service"     => "audit"
+    }
+  }
+}

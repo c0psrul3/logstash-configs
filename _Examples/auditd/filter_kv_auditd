@@ -1,0 +1,72 @@
+# This uses the 'key-value' filter to do most of the grunt-work of parsing
+# audit.log lines. We then use a grok filter to pluck out the date
+# information. And finally, a mutate dictionary to translate the auditd
+# short field-names into fields that are more descriptive.
+#
+# This doesn't work with Logstash 1.4, but should with more mature kv
+# implementations.
+filter {
+  # Do the initial parse of the whole log-line
+  kv { }
+  # Use Grok to extract out the audit_epoch and audit_counter from the parsed
+  # 'msg' field we now have.
+  grok {
+    match => { 
+      "msg" => "audit\(%{NUMBER:audit_epoch}:%{NUMBER:audit_counter}\):"
+    }
+  }
+  # Translate the short audit field-names to human-acessible ones.
+  mutate {
+    rename => {
+      'a0' => 'arg0'
+      'a1' => 'arg1'
+      'a2' => 'arg2'
+      'a3' => 'arg3'
+      'acct' => 'account'
+      'addr' => 'host_address'
+      'auid' => 'uid_audit'
+      'cmd' => 'command_line'
+      'comm' => 'command'
+      'cwd' => 'command_working_directory'
+      'egid' => 'gid_effective'
+      'euid' => 'uid_effective'
+      'exe' => 'exec_path'
+      'fsgid' => 'gid_fs'
+      'fsuid' => 'uid_fs'
+      'items' => 'path_count'
+      'key' => 'audit_rule'
+      'name' => 'syscall_path'
+      'oauid' => 'original_uid_audit'
+      'ocomm' => 'original_command'
+      'opid' => 'original_pid'
+      'oses' => 'original_session_id'
+      'ouid' => 'uid_original'
+      'obj' => 'sel_obj'
+      'obj_gid' => 'gid_object'
+      'obj_lev_high' => 'sel_high_obj'
+      'obj_lev_low' => 'sel_low_obj'
+      'obj_role' => 'sel_role'
+      'obj_uid' => 'uid_object'
+      'obj_user' => 'sel_user'
+      'ogid' => 'gid_owner'
+      'ouid' => 'uid_owner'
+      'path' => 'avc_path'
+      'ppid' => 'parent_pid'
+      'sauid' => 'sending_uid_audit'
+      'ses' => 'session_id'
+      'sgid' => 'gid_set'
+      'subj' => 'sel_subject'
+      'subj_clr' => 'sel_subject_clearance'
+      'subj_role' => 'sel_subject_role'
+      'subj_sen' => 'sel_subject_sensitivity'
+      'subj_user' => 'sel_subject_user'
+      'suid' => 'uid_set'
+    }
+  }
+  # Set the timestamp
+  date {
+    match => [ 'audit_epoch', 'UNIX' ]
+  }
+
+
+}

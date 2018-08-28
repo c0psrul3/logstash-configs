@@ -1,0 +1,69 @@
+#Logs Switch Cisco 2960
+#http://stackoverflow.com/questions/24763404/groking-cisco-switches-with-logstash
+<%{NUMBER:message_type_id}>%{NUMBER:internal_id}: %{GREEDYDATA}\"%{HOSTNAME:hostname}:5143\"\]: <ios-log-msg><facility>%{WORD:facility}</facility><severity>%{NUMBER:severity}</severity><msg-id>%{WORD:message_type}</msg-id><time>%{SYSLOGTIMESTAMP:message_timestamp}</time><args><arg id=\"0\">%{DATA:arg_0}</arg><arg id=\"1\">%{DATA:arg_1}</arg><arg id=\"2\">%{DATA:arg_2}</arg><arg id=\"3\">%{DATA:arg_3}</arg><arg id=\"4\">%{DATA:arg_4}</arg></args></ios-log-msg>"
+
+<%{NUMBER:message_type_id}>%{NUMBER:internal_id}: %{GREEDYDATA}\"%{HOSTNAME:hostname}:5143\"\]: <ios-log-msg><facility>%{WORD:facility}</facility><severity>%{NUMBER:severity}</severity><msg-id>%{WORD:message_type}</msg-id><time>%{SYSLOGTIMESTAMP:message_timestamp}</time><args><arg id=\"0\">%{DATA:arg_0}</arg><arg id=\"1\">%{DATA:arg_1}</arg><arg id=\"2\">%{DATA:arg_2}</arg><arg id=\"3\">%{DATA:arg_3}</arg></args></ios-log-msg>"
+
+<%{NUMBER:message_type_id}>%{NUMBER:internal_id}: %{GREEDYDATA}\"%{HOSTNAME:hostname}:5143\"\]: <ios-log-msg><facility>%{WORD:facility}</facility><severity>%{NUMBER:severity}</severity><msg-id>%{WORD:message_type}</msg-id><time>%{SYSLOGTIMESTAMP:message_timestamp}</time><args><arg id=\"0\">%{DATA:arg_0}</arg><arg id=\"1\">%{DATA:arg_1}</arg><arg id=\"2\">%{DATA:arg_2}</arg></args></ios-log-msg>"
+
+<%{NUMBER:message_type_id}>%{NUMBER:internal_id}: %{GREEDYDATA}\"%{HOSTNAME:hostname}:5143\"\]: <ios-log-msg><facility>%{WORD:facility}</facility><severity>%{NUMBER:severity}</severity><msg-id>%{WORD:message_type}</msg-id><time>%{SYSLOGTIMESTAMP:message_timestamp}</time><args><arg id=\"0\">%{DATA:arg_0}</arg><arg id=\"1\">%{DATA:arg_1}</arg></args></ios-log-msg>"
+
+<%{NUMBER:message_type_id}>%{NUMBER:internal_id}: %{GREEDYDATA}\"%{HOSTNAME:hostname}:5143\"\]: <ios-log-msg><facility>%{WORD:facility}</facility><severity>%{NUMBER:severity}</severity><msg-id>%{WORD:message_type}</msg-id><time>%{SYSLOGTIMESTAMP:message_timestamp}</time><args><arg id=\"0\">%{DATA:arg_0}</arg></args></ios-log-msg>"
+
+<%{NUMBER:message_type_id}>%{NUMBER:internal_id}: %{GREEDYDATA}\"%{HOSTNAME:hostname}:5143\"\]: <ios-log-msg><facility>%{WORD:facility}</facility><severity>%{NUMBER:severity}</severity><msg-id>%{WORD:message_type}</msg-id><time>%{SYSLOGTIMESTAMP:message_timestamp}</time><args>%{DATA:args}</args></ios-log-msg>"
+
+#Logs Switch Cisco Nexus
+#https://gist.github.com/justinjahn/85305bc7b7df9a6412baedce5f1a0ece
+%{SYSLOG5424PRI}(%{NUMBER:log_sequence#})?: %{NEXUSTIMESTAMP:log_date}: %%{CISCO_REASON:facility}-%{INT:severity_level}-%{CISCO_REASON:facility_mnemonic}: %{GREEDYDATA:message}
+
+%{SYSLOG5424PRI}(%{NUMBER:log_sequence#})?: %{NEXUSTIMESTAMP:log_date}: %%{CISCO_REASON:facility}-%{CISCO_REASON:facility_sub}-%{INT:severity_level}-%{CISCO_REASON:facility_mnemonic}: %{GREEDYDATA:message}
+
+#Logs LoadBalancer Citrix NetScaler
+#https://gist.github.com/haukurk/95a7dad58ff475fbb987
+<%{POSINT:syslog_pri}> %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{GREEDYDATA:netscaler_message} : %{DATA} %{IP:source_ip}:%{POSINT:source_port} - %{DATA} %{IP:vserver_ip}:%{POSINT:vserver_port} - %{DATA} %{IP:nat_ip}:%{POSINT:nat_port} - %{DATA} %{IP:destination_ip}:%{POSINT:destination_port} - %{DATA} %{DATE_US:DELINK_DATE}:%{TIME:DELINK_TIME} GMT - %{DATA} %{POSINT:total_bytes_sent} - %{DATA} %{POSINT:total_bytes_recv}
+
+<%{POSINT:syslog_pri}> %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{GREEDYDATA:netscaler_message} : %{DATA} %{IP:source_ip}:%{POSINT:source_port} - %{DATA} %{IP:destination_ip}:%{POSINT:destination_port} - %{DATA} %{DATE_US:START_DATE}:%{TIME:START_TIME} GMT - %{DATA} %{DATE_US:END_DATE}:%{TIME:END_TIME} GMT - %{DATA} %{POSINT:total_bytes_sent} - %{DATA} %{POSINT:total_bytes_recv}
+                                
+<%{POSINT:syslog_pri}> %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{GREEDYDATA:netscaler_message} : %{DATA} %{INT:netscaler_spcbid} - %{DATA} %{IP:clientip} - %{DATA} %{INT:netscaler_client_port} - %{DATA} %{IP:netscaler_vserver_ip} - %{DATA} %{INT:netscaler_vserver_port} %{GREEDYDATA:netscaler_message} - %{DATA} %{WORD:netscaler_session_type}
+
+<%{POSINT:syslog_pri}> %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{GREEDYDATA:netscaler_message}
+
+#OSSEC
+%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_host} %{DATA:syslog_program}: Alert Level: %{NONNEGINT:Alert_Level}; Rule: %{NONNEGINT:Rule} - %{DATA:Description}; Location: %{DATA:Location}; (user: %{USER:User};%{SPACE})?(srcip: %{IP:Src_IP};%{SPACE})?(user: %{USER:User};%{SPACE})?(dstip: %{IP:Dst_IP};%{SPACE})?(src_port: %{NONNEGINT:Src_Port};%{SPACE})?(dst_port: %{NONNEGINT:Dst_Port};%{SPACE})?%{GREEDYDATA:Details}
+
+#Percona
+#http://fr.slideshare.net/YoungHeonKim1/mysql-audit-using-percona-audit-plugin-and-elk
+
+filter {
+   grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:sys_timestamp}%{SPACE}%{HOSTNAME:host_name}%{SPACE} percona-audit: %{GREEDYDATA:json_data}"}
+   }
+   json {
+        source => "json_data"
+  }
+}
+
+#Squid
+#https://gist.github.com/sakalajuraj/6339942
+%{NUMBER:timestamp}\s+%{NUMBER:request_msec:float} %{IPORHOST:src_ip} %{COMMONMAC:src_mac} %{WORD}/%{NUMBER:response_status:int} %{NUMBER:response_size:int} %{WORD:http_method} (%{URIPROTO:http_proto}://)?%{IPORHOST2:dst_host}(?::%{POSINT:port})?(?:%{NOTSPACE:uri_param})? %{USERNAME:user} %{WORD}/(%{IPORHOST:dst_ip}|-) %{GREEDYDATA:content_type}
+
+
+#TOMCAT
+https://github.com/TristanBrismontier/Logstash_configuration/blob/master/tomcat-logstash-grok.conf
+http://www.tothenew.com/blog/applying-grok-patterns-in-elk/
+
+#MySQL/MariaDB
+https://simonhanmer.co.uk/processing-mysql-mariadb-galera-logs-for-logstash/
+
+#Tacacs
+#Pour la log = 2013-04-10 09:19:33 +0200	90.113.48.104	12345678	tty1	90.113.54.10	stop	task_id=178	start_time=1365578374	timezone=utc	service=shell	priv-lvl=1	cmd=show <cr>
+%{TIMESTAMP_ISO8601:timestamp}%{SPACE}%{ISO8601_TIMEZONE:timezone}%{SPACE}*%{IP:ip}%{SPACE}%{WORD:unknown}%{SPACE}%{WORD:terminal}%{SPACE}%{IP:from}%{SPACE}%{WORD:state}%{SPACE}task_id=%{NUMBER:taskId}%{SPACE}start_time=%{NUMBER:startTime}%{SPACE}timezone=%{WORD:tz}%{SPACE}service=%{WORD:service}%{SPACE}priv-lvl=%{NUMBER:privLvl}%{SPACE}cmd=%{WORD:cmd}%{SPACE}<cr>
+
+#POSFIX
+https://github.com/whyscream/postfix-grok-patterns/blob/master/postfix.grok
+
+#ActiveDirectory (netlogon)
+#Pour les logs 
+#01/11 11:31:21 [SITE] DsrGetSiteName: Returning site name 'Hub-site' from local cache
+#01/11 11:31:21 [MAILSLOT] Received ping from BMWDC02 JR.BMW.lab (null) on <Local>
+%{MONTHNUM:month}/%{MONTHDAY:day}%{SPACE}%{TIME:time}%{SPACE}\[%{WORD:flag}\]%{SPACE}%{GREEDYDATA:message}

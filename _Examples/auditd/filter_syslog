@@ -1,0 +1,23 @@
+# Sometimes, audit entries are dumped to syslog. These patterns
+# can still be used for that:
+filter {
+  grok {
+    patterns_dir => "/etc/logstash/patterns/"
+    match => {
+      "message" => [
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITLOGIN}",
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITSYSCALL}",
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITEXECVE}",
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITCWD}",
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITPATHSHORT}",
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITPATHLONG}",
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITPAMLOGIN}",
+        "%{SYSLOGBASE2}%{SPACE}%{AUDITCONFIG}"
+      ]
+    }
+  }
+  date {
+    match => [ 'audit_epoch', 'UNIX' ]
+  }
+}
+

@@ -1,0 +1,96 @@
+#/*  vim:  set filetype=config :  */
+#
+## Logstash configuration for version 5.5.0
+#
+# start Logstash with:
+#
+##source /usr/local/gnsms/etc/source.env
+##nohup bash ${SCRIPTDIR}/logstash/bin/logstash agent \
+#   --path.config ${CETCDIR}/logstash-agent-<hostname>.conf \
+#   --config.reload.automatic true \  # already defined in logstash.yml
+#   --config.reload.interval 120 \    # already defined in logstash.yml
+#   --pipeline.workers 8 \            # already defined in logstash.yml
+#   --log.level warn \                # already defined in logstash.yml
+#   --path.data /tmp/logstash/data \  # already defined in logstash.yml
+#   --path.logs /tmp/logstash/log \   # already defined in logstash.yml
+#     &>> /tmp/logstash.log &
+#
+#export JAVA_HOME=/usr/local/gnsms/arch-i86pc/java
+#export JAVA_HOME=/opt/csw/java/jre/jre8/bin
+#export JAVA_HOME=/opt/csw/java/jdk/jdk8
+#export JAVA_HOME=/opt/csw/java/jdk1.8.0_92
+#export JAVA_HOME=/opt/csw/java/jdk1.8.0_102
+#
+
+input {
+  #udp {
+  #  port => 514
+  #  type => syslog
+  #}
+  file {
+    path => "/var/log/authlog"
+    type => "syslog"
+  }
+  #file {
+  #  path => "/var/adm/sulog"
+  #  type => "syslog"
+  #}
+  file {
+    path => [ "/var/log/syslog", "/var/adm/messages", "/var/adm/systemlog" ]
+    type => "syslog"
+  }
+  #file {
+  #  path => [ "/var/svc/log/*.log" ]
+  #  type => "syslog"  ##  servicelog
+  #}
+}
+
+
+filter {
+  mutate {
+{% if host_dwiki_tags %}
+    add_tag => [ "{{ host_gnsms_clientname }}", "{{ host_dwiki_tags }}" ]
+{% endif %}
+{% if ansible_os_version %}
+    add_field => { "source_os" => "{{ host_dwiki_os_family }} {{ ansible_os_version }}" }
+{% endif %}
+  }
+
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    date {
+      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+  }
+}
+
+
+output {
+  stdout { codec => rubydebug }
+
+  elasticsearch {
+    hosts => [ "logging.gnetsys.com:9292" ]
+    manage_template => true
+    #index => ## Default value is "logstash-%{+YYYY.MM.dd}"
+  }
+
+  #redis {
+  #  host => "localhost"
+  #  data_type => "list"
+  #  key => "logstash"
+  #}
+
+#  if [type] == "apache" {
+#    if [status] =~ /^5\d\d/ {
+#      nagios { ...  }
+#    } else if [status] =~ /^4\d\d/ {
+#      elasticsearch { ... }
+#    }
+#    statsd { increment => "apache.%{status}" }
+#  }
+}
+
